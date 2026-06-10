@@ -1,16 +1,12 @@
 $ErrorActionPreference = "Stop"
 
-Write-Host "Starting LiteLLM Proxy in the background..." -ForegroundColor Cyan
+Write-Host "Cleaning up zombie processes on port 8000..." -ForegroundColor Yellow
+Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
 
-# Check if LiteLLM is already running on port 8000
-$tcpConns = Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue
-if ($null -eq $tcpConns) {
-    Start-Process -WindowStyle Hidden -FilePath "litellm" -ArgumentList "--config C:\Users\AA_p\litellm_config.yaml --port 8000"
-    Start-Sleep -Seconds 3
-    Write-Host "LiteLLM Proxy started!" -ForegroundColor Green
-} else {
-    Write-Host "LiteLLM Proxy is already running on port 8000." -ForegroundColor Yellow
-}
+Write-Host "Starting LiteLLM Proxy in the background..." -ForegroundColor Cyan
+Start-Process -WindowStyle Hidden -FilePath "litellm" -ArgumentList "--config C:\Users\AA_p\litellm_config.yaml --port 8000"
+Start-Sleep -Seconds 3
+Write-Host "LiteLLM Proxy started!" -ForegroundColor Green
 
 Write-Host "Configuring Claude Code environment..." -ForegroundColor Cyan
 $env:ANTHROPIC_BASE_URL = "http://localhost:8000"
