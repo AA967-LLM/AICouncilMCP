@@ -1,0 +1,6 @@
+model_list:
+  - model_name: claude-3-5-sonnet-20241022
+    litellm_params:
+      model: ollama/claude-3-5-sonnet:latest
+      api_base: http://localhost:11434
+      custom_llm_provider: ollama
